@@ -39,14 +39,23 @@ public class Builder {
         Path CCACHE_DIR_PATH = Paths.get("");
         Boolean CCACHE = false;
         
+        System.out.println(" ____        _ _     _           ");
+        System.out.println("|  _ \\      (_) |   | |          ");
+        System.out.println("| |_) |_   _ _| | __| | ___ _ __ ");
+        System.out.println("|  _ <| | | | | |/ _` |/ _ \\ '__|");
+        System.out.println("| |_) | |_| | | | (_| |  __/ |   ");
+        System.out.println("|____/ \\__,_|_|_|\\__,_|\\___|_|   ");
+        
         // Arguments
         if (args.length > 0) {
             // ccache
             if ( argumentsController(args[2]) ) {
-                System.out.println("\nUse of ccache is enabled");
+                System.out.println("\n- - - DETERMINED CCACHE USE STATUS: " + args[2] + " - - -");
+                System.out.println("\n- - - USE OF CCACHE IS ENABLED - - -");
                 CCACHE_DIR_PATH = Paths.get(args[3]);
+                System.out.println("\n - - - DETERMINED CCACHE DIR PATH: " + args[3] + " - - -");
                 if ( Files.notExists(CCACHE_DIR_PATH) ) {
-                    System.err.println("\nccache dirname is wrong!");
+                    System.err.println("\n- - - ERROR: CCACHE DIR IS WRONG - - -");
                     System.exit(1);
                 }
                 CCACHE = true;
@@ -58,7 +67,8 @@ public class Builder {
             
             // repo sync
             if ( argumentsController(args[1]) ) {
-                System.out.println("\nrepo sync is enabled");
+                System.out.println("\n- - - DETERMINED REPO SYNC STATUS: " + args[1] + " - - -");
+                System.out.println("\n- - - REPO SYNC IS ENABLED - - -");
                 COMMAND = commandBuilder(COMMAND, " && " + COMMAND_REPO + " " + COMMAND_REPO_SYNC + " " + COMMAND_THREADS);
             }
             
@@ -68,11 +78,14 @@ public class Builder {
             } else {
                 TARGET = args[3];
             }
+            System.out.println("- - - FOUND TARGET NAME: " + TARGET + " - - -");
+            System.out.println("- - - ADD INITIALIZATION STEP - - -");
             COMMAND = commandBuilder(COMMAND, " && " + COMMAND_SOURCE + " " + ENVSETUP + " && " + COMMAND_LUNCH + " " + TARGET);
             
             // Clean up
             if ( argumentsController(args[0]) ) {
-                System.out.println("\nClean is enabled");
+                System.out.println("\n- - - DETERMINED CLEAN STATUS: " + args[0] + " - - -");
+                System.out.println("\n- - - CLEAN IS DISABLED - - -");
                 COMMAND = commandBuilder(COMMAND, " && " + COMMAND_MAKE + " " + COMMAND_MAKE_INSTALLCLEAN + " " + COMMAND_THREADS);
             }
             
@@ -86,8 +99,8 @@ public class Builder {
             COMMAND = commandBuilder(COMMAND, " && " + COMMAND_MAKE + " " + COMMAND_MAKE_TARGET + " " + COMMAND_THREADS);
             
             // EXECUTE TIME
-            System.out.println("\nCommand ready: " + COMMAND);
-            System.out.println("\nExecuting...\n");
+            System.out.println("\n- - - COMMAND READY: " + COMMAND + " - - -");
+            System.out.println("\n- - - EXECUTING: " + COMMAND + " - - -\n");
             executeCommands(COMMAND);
         } else {
             usage();
@@ -135,7 +148,7 @@ public class Builder {
     }
     
     public static String commandBuilder(String COMMAND, String ADD) {
-        System.out.println("\nCommandsController.commandBuilder: Adding '" + ADD + "' to '" + COMMAND + "'");
+        System.out.println("\n- - - ADDING '" + ADD + "' TO '" + COMMAND + "'");
         COMMAND = COMMAND + ADD;
         return COMMAND;
     }
