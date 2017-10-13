@@ -98,7 +98,7 @@ public class Main {
                 if ( ArgumentsController.argumentsController(args[6]) ) {
                     UPLOAD = true;
                     System.out.println("\n- - - UPLOAD DATA FOUND - - -");
-                    COMMAND = CommandsController.commandBuilder(COMMAND, " && " + COMMAND_UPLOAD + " -T " + COMMAND_UPLOAD_FILE + args[7] + " --user " + args[8], false);
+                    COMMAND = CommandsController.commandBuilder(COMMAND, " && " + COMMAND_UPLOAD + " -T " + COMMAND_UPLOAD_FILE + " " + args[7] + " --user " + args[8], false);
                 }
             } else if ( ArgumentsController.argumentsController(args[5]) ) {
                 UPLOAD = true;
