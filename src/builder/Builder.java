@@ -78,8 +78,8 @@ public class Builder {
             } else {
                 TARGET = args[3];
             }
-            System.out.println("- - - FOUND TARGET NAME: " + TARGET + " - - -");
-            System.out.println("- - - ADD INITIALIZATION STEP - - -");
+            System.out.println("\n- - - FOUND TARGET NAME: " + TARGET + " - - -");
+            System.out.println("\n- - - ADD INITIALIZATION STEP - - -");
             COMMAND = commandBuilder(COMMAND, " && " + COMMAND_SOURCE + " " + ENVSETUP + " && " + COMMAND_LUNCH + " " + TARGET);
             
             // Clean up
@@ -148,7 +148,7 @@ public class Builder {
     }
     
     public static String commandBuilder(String COMMAND, String ADD) {
-        System.out.println("\n- - - ADDING '" + ADD + "' TO '" + COMMAND + "'");
+        System.out.println("\n- - - ADDING '" + ADD + "' TO '" + COMMAND + "' - - -");
         COMMAND = COMMAND + ADD;
         return COMMAND;
     }
