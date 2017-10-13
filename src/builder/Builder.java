@@ -29,10 +29,7 @@ public class Builder {
         String COMMAND_UPLOAD = "curl";
         String COMMAND_UPLOAD_FILE = "out/target/product/*/*.zip";
         String COMMAND_UPLOAD_URL = "uploads.androidfilehost.com";
-        // String DEVICE = "bullhead"; // Deprecated
-        // String PREFIX = "aosp"; // Deprecated
-        // String BUILD_TYPE = "userdebug"; // Deprecated
-        String TARGET = ""; // Instead of DEVICE, PREFIX, BUILD_TYPE
+        String TARGET = "";
         String COMMAND_LUNCH = "lunch";
         String COMMAND_SOURCE = "source";
         String ENVSETUP = "build/envsetup.sh";
