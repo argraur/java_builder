@@ -22,7 +22,7 @@ public class Main {
         String COMMAND_REPO_SYNC = "sync -f";
         String COMMAND_THREADS = "-j64";
         String COMMAND_UPLOAD = "curl";
-        String COMMAND_UPLOAD_FILE = "out/target/product/*/*.zip";
+        String COMMAND_UPLOAD_FILE = "out/target/product/*/*-ota-$BUILD_NUMBER.zip";
         String COMMAND_UPLOAD_URL = "uploads.androidfilehost.com";
         String TARGET = "";
         String COMMAND_LUNCH = "lunch";
