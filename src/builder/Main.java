@@ -23,7 +23,6 @@ public class Main {
         String COMMAND_THREADS = "-j64";
         String COMMAND_UPLOAD = "curl";
         String COMMAND_UPLOAD_FILE = "out/target/product/*/*-ota-$BUILD_NUMBER.zip";
-        String COMMAND_UPLOAD_URL = "uploads.androidfilehost.com";
         String TARGET = "";
         String COMMAND_LUNCH = "lunch";
         String COMMAND_SOURCE = "source";
@@ -99,12 +98,12 @@ public class Main {
                 if ( ArgumentsController.argumentsController(args[6]) ) {
                     UPLOAD = true;
                     System.out.println("\n- - - UPLOAD DATA FOUND - - -");
-                    COMMAND = CommandsController.commandBuilder(COMMAND, " && " + COMMAND_UPLOAD + " -T " + COMMAND_UPLOAD_FILE + " -s " + COMMAND_UPLOAD_URL + " --user " + args[7], false);
+                    COMMAND = CommandsController.commandBuilder(COMMAND, " && " + COMMAND_UPLOAD + " -T " + COMMAND_UPLOAD_FILE + args[7] + " --user " + args[8], false);
                 }
             } else if ( ArgumentsController.argumentsController(args[5]) ) {
                 UPLOAD = true;
                 System.out.println("\n- - - UPLOAD DATA FOUND - - -");
-                COMMAND = CommandsController.commandBuilder(COMMAND, COMMAND_UPLOAD + " -T " + COMMAND_UPLOAD_FILE + " -s" + COMMAND_UPLOAD_URL + " --user " + args[6], false);
+                COMMAND = CommandsController.commandBuilder(COMMAND, COMMAND_UPLOAD + " -T " + COMMAND_UPLOAD_FILE + " " + args[6] + " --user " + args[7], false);
             }
             // EXECUTE TIME
             if (UPLOAD) {
@@ -117,7 +116,7 @@ public class Main {
 
             CommandsController.executeCommands(COMMAND);
         } else {
-            System.out.println("Usage: java -jar Builder.jar [clean] [sync] [ccache] [ccachedir] [target] [make target] [upload] [upload credentials]");
+            System.out.println("Usage: java -jar Builder.jar [clean] [sync] [ccache] [ccachedir] [target] [make target] [upload] [upload url] [upload credentials]");
             System.out.println("clean: 1 or 0: Whether perform clean or no (int)");
             System.out.println("sync: 1 or 0: Whether sync or not (int)");
             System.out.println("ccache: 1 or 0: Whether use ccache or not (int)");
@@ -125,6 +124,7 @@ public class Main {
             System.out.println("target: e.g. aosp_bullhead-userdebug");
             System.out.println("make target: e.g. otapackage; dist: Make target (String)");
             System.out.println("upload: 1 or 0: Whether upload or not (int)");
+            System.out.println("upload url: URL for upload server");
             System.out.println("upload credentials: user:password: Credentials for upload (String) ONLY IF upload == 1");
         }
     }

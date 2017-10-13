@@ -1,6 +1,6 @@
 # Usage of builder
 ```
-java -jar builder.jar [clean] [repo sync] [use ccache] [ccache dir] [device target] [make target] [upload] [credentials]
+java -jar builder.jar [clean] [repo sync] [use ccache] [ccache dir] [device target] [make target] [upload] [upload url] [credentials]
 ```
 
 ### Arguments
@@ -11,10 +11,11 @@ java -jar builder.jar [clean] [repo sync] [use ccache] [ccache dir] [device targ
 4. **ccache dir: working directory for ccache (String)**
 5. **device target: device target for lunch (String)**
 6. **make target: make target (String)**
-7. **upload: 1 or 0: Whether upload output file (String)**
+7. **upload: 1 or 0: Whether upload output file (int)**
+8. **upload url: url for upload (String)**
 8. **credentials: user:passwd: Credentials for upload (String)**
 
 ## Example
 ```
-java -jar builder.jar 1 1 1 ~/.ccache bullhead-userdebug otapackage 1 argraur:password
+java -jar builder.jar 1 1 1 ~/.ccache bullhead-userdebug otapackage 1 ftp://uploads.androidfilehost.com argraur:password
 ```
