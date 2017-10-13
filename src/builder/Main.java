@@ -5,17 +5,12 @@
  */
 package builder;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Writer;
 
-public class Builder {
+public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
         // Variables
         String COMMAND_EXPORT = "export";
@@ -49,7 +44,7 @@ public class Builder {
         // Arguments
         if (args.length > 0) {
             // ccache
-            if ( argumentsController(args[2]) ) {
+            if ( ArgumentsController.argumentsController(args[2]) ) {
                 System.out.println("\n- - - DETERMINED CCACHE USE STATUS: " + args[2] + " - - -");
                 System.out.println("\n- - - USE OF CCACHE IS ENABLED - - -");
                 CCACHE_DIR_PATH = Paths.get(args[3]);
@@ -59,17 +54,17 @@ public class Builder {
                     System.exit(1);
                 }
                 CCACHE = true;
-                COMMAND = commandBuilder(COMMAND, COMMAND_EXPORT + " " + COMMAND_EXPORT_CCACHE + "1" + " && " + COMMAND_EXPORT + " " + COMMAND_EXPORT_CCACHE_DIR + args[3], true);
+                COMMAND = CommandsController.commandBuilder(COMMAND, COMMAND_EXPORT + " " + COMMAND_EXPORT_CCACHE + "1" + " && " + COMMAND_EXPORT + " " + COMMAND_EXPORT_CCACHE_DIR + args[3], true);
             } else {
                 CCACHE = false;
-                COMMAND = commandBuilder(COMMAND, COMMAND_EXPORT + " " + COMMAND_EXPORT_CCACHE + "0", true);
+                COMMAND = CommandsController.commandBuilder(COMMAND, COMMAND_EXPORT + " " + COMMAND_EXPORT_CCACHE + "0", true);
             }
             
             // repo sync
-            if ( argumentsController(args[1]) ) {
+            if ( ArgumentsController.argumentsController(args[1]) ) {
                 System.out.println("\n- - - DETERMINED REPO SYNC STATUS: " + args[1] + " - - -");
                 System.out.println("\n- - - REPO SYNC IS ENABLED - - -");
-                COMMAND = commandBuilder(COMMAND, " && " + COMMAND_REPO + " " + COMMAND_REPO_SYNC + " " + COMMAND_THREADS, true);
+                COMMAND = CommandsController.commandBuilder(COMMAND, " && " + COMMAND_REPO + " " + COMMAND_REPO_SYNC + " " + COMMAND_THREADS, true);
             }
             
             // Initialize
@@ -80,13 +75,13 @@ public class Builder {
             }
             System.out.println("\n- - - FOUND TARGET NAME: " + TARGET + " - - -");
             System.out.println("\n- - - ADD INITIALIZATION STEP - - -");
-            COMMAND = commandBuilder(COMMAND, " && " + COMMAND_SOURCE + " " + ENVSETUP + " && " + COMMAND_LUNCH + " " + TARGET, true);
+            COMMAND = CommandsController.commandBuilder(COMMAND, " && " + COMMAND_SOURCE + " " + ENVSETUP + " && " + COMMAND_LUNCH + " " + TARGET, true);
             
             // Clean up
-            if ( argumentsController(args[0]) ) {
+            if ( ArgumentsController.argumentsController(args[0]) ) {
                 System.out.println("\n- - - DETERMINED CLEAN STATUS: " + args[0] + " - - -");
                 System.out.println("\n- - - CLEAN IS DISABLED - - -");
-                COMMAND = commandBuilder(COMMAND, " && " + COMMAND_MAKE + " " + COMMAND_MAKE_INSTALLCLEAN + " " + COMMAND_THREADS, true);
+                COMMAND = CommandsController.commandBuilder(COMMAND, " && " + COMMAND_MAKE + " " + COMMAND_MAKE_INSTALLCLEAN + " " + COMMAND_THREADS, true);
             }
             
             if (CCACHE) {
@@ -96,20 +91,20 @@ public class Builder {
             }
             
             // Build
-            COMMAND = commandBuilder(COMMAND, " && " + COMMAND_MAKE + " " + COMMAND_MAKE_TARGET + " " + COMMAND_THREADS, true);
+            COMMAND = CommandsController.commandBuilder(COMMAND, " && " + COMMAND_MAKE + " " + COMMAND_MAKE_TARGET + " " + COMMAND_THREADS, true);
             
             // UPLOAD
             // DO NOT DEBUG (DO NOT SHOW PASSWORD OFF)
             if (CCACHE) {
-                if ( argumentsController(args[6]) ) {
+                if ( ArgumentsController.argumentsController(args[6]) ) {
                     UPLOAD = true;
                     System.out.println("\n- - - UPLOAD DATA FOUND - - -");
-                    COMMAND = commandBuilder(COMMAND, " && " + COMMAND_UPLOAD + " -T " + COMMAND_UPLOAD_FILE + " -s " + COMMAND_UPLOAD_URL + " --user " + args[7], false);
+                    COMMAND = CommandsController.commandBuilder(COMMAND, " && " + COMMAND_UPLOAD + " -T " + COMMAND_UPLOAD_FILE + " -s " + COMMAND_UPLOAD_URL + " --user " + args[7], false);
                 }
-            } else if ( argumentsController(args[5]) ) {
+            } else if ( ArgumentsController.argumentsController(args[5]) ) {
                 UPLOAD = true;
                 System.out.println("\n- - - UPLOAD DATA FOUND - - -");
-                COMMAND = commandBuilder(COMMAND, COMMAND_UPLOAD + " -T " + COMMAND_UPLOAD_FILE + " -s" + COMMAND_UPLOAD_URL + " --user " + args[6], false);
+                COMMAND = CommandsController.commandBuilder(COMMAND, COMMAND_UPLOAD + " -T " + COMMAND_UPLOAD_FILE + " -s" + COMMAND_UPLOAD_URL + " --user " + args[6], false);
             }
             // EXECUTE TIME
             if (UPLOAD) {
@@ -120,69 +115,17 @@ public class Builder {
                 System.out.println("\n- - - EXECUTING: " + COMMAND + " - - -\n");
             }
 
-            executeCommands(COMMAND);
+            CommandsController.executeCommands(COMMAND);
         } else {
-            usage();
+            System.out.println("Usage: java -jar Builder.jar [clean] [sync] [ccache] [ccachedir] [target] [make target] [upload] [upload credentials]");
+            System.out.println("clean: 1 or 0: Whether perform clean or no (int)");
+            System.out.println("sync: 1 or 0: Whether sync or not (int)");
+            System.out.println("ccache: 1 or 0: Whether use ccache or not (int)");
+            System.out.println("ccachedir: If using ccache only! Define dir path for ccache (String)");
+            System.out.println("target: e.g. aosp_bullhead-userdebug");
+            System.out.println("make target: e.g. otapackage; dist: Make target (String)");
+            System.out.println("upload: 1 or 0: Whether upload or not (int)");
+            System.out.println("upload credentials: user:password: Credentials for upload (String) ONLY IF upload == 1");
         }
-    }
-    
-    public static Boolean argumentsController(String ARGUMENT) {
-        try {
-            int VALUE = Integer.parseInt(ARGUMENT);
-            return VALUE == 1;
-        }
-        catch (NumberFormatException E) {
-            System.err.println("Argument" + ARGUMENT + " must be an integer.");
-            System.exit(1);
-            return false;
-        }
-    }
-    public static void executeCommands(String COMMAND) throws IOException, InterruptedException {
-
-        File TEMP_SCRIPT = createTempScript(COMMAND);
-        
-        try {
-            ProcessBuilder PB = new ProcessBuilder("bash", TEMP_SCRIPT.toString());
-            PB.inheritIO();
-            Process PROCESS = PB.start();
-            PROCESS.waitFor();
-        } finally {
-            TEMP_SCRIPT.delete();
-        }
-    }
-
-    public static File createTempScript(String COMMAND) throws IOException {
-        File TEMP_SCRIPT = File.createTempFile("script", null);
-
-        Writer STREAM_WRITER = new OutputStreamWriter(new FileOutputStream(
-                TEMP_SCRIPT));
-        PrintWriter PRINT_WRITER = new PrintWriter(STREAM_WRITER);
-
-        PRINT_WRITER.println("#!/bin/bash");
-        PRINT_WRITER.println(COMMAND);
-
-        PRINT_WRITER.close();
-
-        return TEMP_SCRIPT;
-    }
-    
-    public static String commandBuilder(String COMMAND, String ADD, Boolean DEBUG) {
-        if (DEBUG) {
-            System.out.println("\n- - - ADDING '" + ADD + "' TO '" + COMMAND + "' - - -");
-        }
-        COMMAND = COMMAND + ADD;
-        return COMMAND;
-    }
-    
-    public static void usage() {
-        System.out.println("Usage: java -jar Builder.jar [clean] [sync] [ccache] [ccachedir] [target] [make target] [upload] [upload credentials]");
-        System.out.println("clean: 1 or 0: Whether perform clean or no (int)");
-        System.out.println("sync: 1 or 0: Whether sync or not (int)");
-        System.out.println("ccache: 1 or 0: Whether use ccache or not (int)");
-        System.out.println("ccachedir: If using ccache only! Define dir path for ccache (String)");
-        System.out.println("target: e.g. aosp_bullhead-userdebug");
-        System.out.println("make target: e.g. otapackage; dist: Make target (String)");
-        System.out.println("upload: 1 or 0: Whether upload or not (int)");
-        System.out.println("upload credentials: user:password: Credentials for upload (String) ONLY IF upload == 1");
     }
 }
