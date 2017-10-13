@@ -47,7 +47,7 @@ public class Builder {
         System.out.println("| |_) |_   _ _| | __| | ___ _ __ ");
         System.out.println("|  _ <| | | | | |/ _` |/ _ \\ '__|");
         System.out.println("| |_) | |_| | | | (_| |  __/ |   ");
-        System.out.println("|____/ \\__,_|_|_|\\__,_|\\___|_|   ");
+        System.out.println("|____/ \\__,_|_|_|\\__,_|\\___|_|   \n");
         
         // Arguments
         if (args.length > 0) {
@@ -106,12 +106,12 @@ public class Builder {
             if (CCACHE) {
                 if ( argumentsController(args[6]) ) {
                     UPLOAD = true;
-                    System.out.println("- - - UPLOAD DATA FOUND - - -");
+                    System.out.println("\n- - - UPLOAD DATA FOUND - - -");
                     COMMAND = commandBuilder(COMMAND, " && " + COMMAND_UPLOAD + " -T " + COMMAND_UPLOAD_FILE + " -s " + COMMAND_UPLOAD_URL + " --user " + args[7], false);
                 }
             } else if ( argumentsController(args[5]) ) {
                 UPLOAD = true;
-                System.out.println("- - - UPLOAD DATA FOUND - - -");
+                System.out.println("\n- - - UPLOAD DATA FOUND - - -");
                 COMMAND = commandBuilder(COMMAND, COMMAND_UPLOAD + " -T " + COMMAND_UPLOAD_FILE + " -s" + COMMAND_UPLOAD_URL + " --user " + args[6], false);
             }
             // EXECUTE TIME
