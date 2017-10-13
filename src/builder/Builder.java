@@ -25,8 +25,10 @@ public class Builder {
         String COMMAND_MAKE_INSTALLCLEAN = "installclean";
         String COMMAND_REPO = "repo";
         String COMMAND_REPO_SYNC = "sync -f";
-        String COMMAND_UPLOAD = "bash upload.sh"; // Not being used at the moment
         String COMMAND_THREADS = "-j64";
+        String COMMAND_UPLOAD = "curl";
+        String COMMAND_UPLOAD_FILE = "out/target/product/*/*.zip";
+        String COMMAND_UPLOAD_URL = "uploads.androidfilehost.com";
         // String DEVICE = "bullhead"; // Deprecated
         // String PREFIX = "aosp"; // Deprecated
         // String BUILD_TYPE = "userdebug"; // Deprecated
@@ -38,6 +40,7 @@ public class Builder {
         String COMMAND = "";
         Path CCACHE_DIR_PATH = Paths.get("");
         Boolean CCACHE = false;
+        Boolean UPLOAD = false;
         
         System.out.println(" ____        _ _     _           ");
         System.out.println("|  _ \\      (_) |   | |          ");
@@ -59,17 +62,17 @@ public class Builder {
                     System.exit(1);
                 }
                 CCACHE = true;
-                COMMAND = commandBuilder(COMMAND, COMMAND_EXPORT + " " + COMMAND_EXPORT_CCACHE + "1" + " && " + COMMAND_EXPORT + " " + COMMAND_EXPORT_CCACHE_DIR + args[3]);
+                COMMAND = commandBuilder(COMMAND, COMMAND_EXPORT + " " + COMMAND_EXPORT_CCACHE + "1" + " && " + COMMAND_EXPORT + " " + COMMAND_EXPORT_CCACHE_DIR + args[3], true);
             } else {
                 CCACHE = false;
-                COMMAND = commandBuilder(COMMAND, COMMAND_EXPORT + " " + COMMAND_EXPORT_CCACHE + "0");
+                COMMAND = commandBuilder(COMMAND, COMMAND_EXPORT + " " + COMMAND_EXPORT_CCACHE + "0", true);
             }
             
             // repo sync
             if ( argumentsController(args[1]) ) {
                 System.out.println("\n- - - DETERMINED REPO SYNC STATUS: " + args[1] + " - - -");
                 System.out.println("\n- - - REPO SYNC IS ENABLED - - -");
-                COMMAND = commandBuilder(COMMAND, " && " + COMMAND_REPO + " " + COMMAND_REPO_SYNC + " " + COMMAND_THREADS);
+                COMMAND = commandBuilder(COMMAND, " && " + COMMAND_REPO + " " + COMMAND_REPO_SYNC + " " + COMMAND_THREADS, true);
             }
             
             // Initialize
@@ -80,13 +83,13 @@ public class Builder {
             }
             System.out.println("\n- - - FOUND TARGET NAME: " + TARGET + " - - -");
             System.out.println("\n- - - ADD INITIALIZATION STEP - - -");
-            COMMAND = commandBuilder(COMMAND, " && " + COMMAND_SOURCE + " " + ENVSETUP + " && " + COMMAND_LUNCH + " " + TARGET);
+            COMMAND = commandBuilder(COMMAND, " && " + COMMAND_SOURCE + " " + ENVSETUP + " && " + COMMAND_LUNCH + " " + TARGET, true);
             
             // Clean up
             if ( argumentsController(args[0]) ) {
                 System.out.println("\n- - - DETERMINED CLEAN STATUS: " + args[0] + " - - -");
                 System.out.println("\n- - - CLEAN IS DISABLED - - -");
-                COMMAND = commandBuilder(COMMAND, " && " + COMMAND_MAKE + " " + COMMAND_MAKE_INSTALLCLEAN + " " + COMMAND_THREADS);
+                COMMAND = commandBuilder(COMMAND, " && " + COMMAND_MAKE + " " + COMMAND_MAKE_INSTALLCLEAN + " " + COMMAND_THREADS, true);
             }
             
             if (CCACHE) {
@@ -96,11 +99,30 @@ public class Builder {
             }
             
             // Build
-            COMMAND = commandBuilder(COMMAND, " && " + COMMAND_MAKE + " " + COMMAND_MAKE_TARGET + " " + COMMAND_THREADS);
+            COMMAND = commandBuilder(COMMAND, " && " + COMMAND_MAKE + " " + COMMAND_MAKE_TARGET + " " + COMMAND_THREADS, true);
             
+            // UPLOAD
+            // DO NOT DEBUG (DO NOT SHOW PASSWORD OFF)
+            if (CCACHE) {
+                if ( argumentsController(args[6]) ) {
+                    UPLOAD = true;
+                    System.out.println("- - - UPLOAD DATA FOUND - - -");
+                    COMMAND = commandBuilder(COMMAND, " && " + COMMAND_UPLOAD + " -T " + COMMAND_UPLOAD_FILE + " -s " + COMMAND_UPLOAD_URL + " --user " + args[7], false);
+                }
+            } else if ( argumentsController(args[5]) ) {
+                UPLOAD = true;
+                System.out.println("- - - UPLOAD DATA FOUND - - -");
+                COMMAND = commandBuilder(COMMAND, COMMAND_UPLOAD + " -T " + COMMAND_UPLOAD_FILE + " -s" + COMMAND_UPLOAD_URL + " --user " + args[6], false);
+            }
             // EXECUTE TIME
-            System.out.println("\n- - - COMMAND READY: " + COMMAND + " - - -");
-            System.out.println("\n- - - EXECUTING: " + COMMAND + " - - -\n");
+            if (UPLOAD) {
+                System.out.println("\n- - - COMMAND READY - - -");
+                System.out.println("\n- - - EXECUTING - - -\n");
+            } else {
+                System.out.println("\n- - - COMMAND READY: " + COMMAND + " - - -");
+                System.out.println("\n- - - EXECUTING: " + COMMAND + " - - -\n");
+            }
+
             executeCommands(COMMAND);
         } else {
             usage();
@@ -147,19 +169,23 @@ public class Builder {
         return TEMP_SCRIPT;
     }
     
-    public static String commandBuilder(String COMMAND, String ADD) {
-        System.out.println("\n- - - ADDING '" + ADD + "' TO '" + COMMAND + "' - - -");
+    public static String commandBuilder(String COMMAND, String ADD, Boolean DEBUG) {
+        if (DEBUG) {
+            System.out.println("\n- - - ADDING '" + ADD + "' TO '" + COMMAND + "' - - -");
+        }
         COMMAND = COMMAND + ADD;
         return COMMAND;
     }
     
     public static void usage() {
-        System.out.println("Usage: java -jar Builder.jar [clean] [sync] [ccache] [ccachedir] [target]");
+        System.out.println("Usage: java -jar Builder.jar [clean] [sync] [ccache] [ccachedir] [target] [make target] [upload] [upload credentials]");
         System.out.println("clean: 1 or 0: Whether perform clean or no (int)");
         System.out.println("sync: 1 or 0: Whether sync or not (int)");
         System.out.println("ccache: 1 or 0: Whether use ccache or not (int)");
         System.out.println("ccachedir: If using ccache only! Define dir path for ccache (String)");
         System.out.println("target: e.g. aosp_bullhead-userdebug");
-        // System.out.println("upload: 1 or 0: Whether sync or not (int)");
+        System.out.println("make target: e.g. otapackage; dist: Make target (String)");
+        System.out.println("upload: 1 or 0: Whether upload or not (int)");
+        System.out.println("upload credentials: user:password: Credentials for upload (String) ONLY IF upload == 1");
     }
 }
