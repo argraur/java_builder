@@ -98,7 +98,12 @@ public class Main {
                 if ( ArgumentsController.argumentsController(args[6]) ) {
                     UPLOAD = true;
                     System.out.println("\n- - - UPLOAD DATA FOUND - - -");
-                    COMMAND = CommandsController.commandBuilder(COMMAND, " && " + COMMAND_UPLOAD + " -T " + COMMAND_UPLOAD_FILE + " " + args[7] + " --user " + args[8], false);
+                    if ( ArgumentsController.argumentsController(args[9]) ) {
+                        COMMAND_UPLOAD_FILE = "./GooglePixel2ROM_bullhead-1.0-STABLE-$(date +%Y%m%d).zip";
+                        COMMAND = CommandsController.commandBuilder(COMMAND, " && " + COMMAND_UPLOAD + " -T " + COMMAND_UPLOAD_FILE + " " + args[7] + " --user " + args[8], false);
+                    } else {
+                        COMMAND = CommandsController.commandBuilder(COMMAND, " && " + COMMAND_UPLOAD + " -T " + COMMAND_UPLOAD_FILE + " " + args[7] + " --user " + args[8], false);
+                    }
                 }
             } else if ( ArgumentsController.argumentsController(args[5]) ) {
                 UPLOAD = true;
@@ -116,7 +121,7 @@ public class Main {
 
             CommandsController.executeCommands(COMMAND);
         } else {
-            System.out.println("Usage: java -jar Builder.jar [clean] [sync] [ccache] [ccachedir] [target] [make target] [upload] [upload url] [upload credentials]");
+            System.out.println("Usage: java -jar Builder.jar [clean] [sync] [ccache] [ccachedir] [target] [make target] [upload] [upload url] [upload credentials] [pixelrom]");
             System.out.println("clean: 1 or 0: Whether perform clean or no (int)");
             System.out.println("sync: 1 or 0: Whether sync or not (int)");
             System.out.println("ccache: 1 or 0: Whether use ccache or not (int)");
@@ -126,6 +131,7 @@ public class Main {
             System.out.println("upload: 1 or 0: Whether upload or not (int)");
             System.out.println("upload url: URL for upload server");
             System.out.println("upload credentials: user:password: Credentials for upload (String) ONLY IF upload == 1");
+            System.out.println("pixelrom: 1 or 0: Whether building PixelROM or not. Uploads PixelROM specific otapackage.");
         }
     }
 }
